@@ -17,6 +17,7 @@ namespace SpriteKind {
     export const Goal = SpriteKind.create()
     export const Coin = SpriteKind.create()
     export const Flier = SpriteKind.create()
+    export const snaper = SpriteKind.create()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherSprite) {
     if (sprite.vy > 0 && !(sprite.isHittingTile(CollisionDirection.Bottom)) || sprite.y < otherSprite.top) {
@@ -31,6 +32,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherS
         music.powerDown.play()
     }
     pause(invincibilityPeriod)
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`tile`, function (sprite, location) {
+    lavaburn()
 })
 function initializeAnimations () {
     initializeHeroAnimations()
@@ -292,6 +296,14 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level_5`)
     } else if (level == 7) {
         tiles.setTilemap(tilemap`level_6`)
+    } else if (level == 8) {
+        tiles.setTilemap(tilemap`level1`)
+    } else if (level == 9) {
+        tiles.setTilemap(tilemap`level2`)
+    } else {
+        if (level == 10) {
+            tiles.setTilemap(tilemap`level3`)
+        }
     }
     initializeLevel(level)
 }
@@ -688,8 +700,8 @@ function animateCrouch () {
         `)
 }
 function clearGame () {
-    for (let value of sprites.allOfKind(SpriteKind.Bumper)) {
-        value.destroy()
+    for (let value10 of sprites.allOfKind(SpriteKind.Bumper)) {
+        value10.destroy()
     }
     for (let value2 of sprites.allOfKind(SpriteKind.Coin)) {
         value2.destroy()
@@ -701,9 +713,21 @@ function clearGame () {
         value4.destroy()
     }
 }
+function lavaburn () {
+    if (lava + 499 < game.runtime()) {
+        info.changeLifeBy(-1)
+        lava = game.runtime()
+    }
+}
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile1`, function (sprite, location) {
     info.changeLifeBy(1)
     currentLevel += 1
+    levelnumber += 1
+    if (levelnumber > 4) {
+        world += 1
+        levelnumber = 1
+    }
+    hero.say("" + world + "-" + levelnumber, 1000)
     if (hasNextLevel()) {
         game.splash("Next level unlocked!")
         setLevelTileMap(currentLevel)
@@ -772,6 +796,28 @@ function createEnemies () {
         animation.attachAnimation(flier, flierFlying)
         animation.attachAnimation(flier, flierIdle)
     }
+    for (let value10 of tiles.getTilesByType(assets.tile`tile13`)) {
+        snapey = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . a a 1 . . . 1 a a . . . . 
+            . . . a a . . . . . a a . . . . 
+            . . . . a a 1 . 1 a a . . . . . 
+            . . . . a a . . . a a . . . . . 
+            . . . . . a a . a a . . . . . . 
+            . . . . . a a 1 a a . . . . . . 
+            . . . . . . a a a . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            . . . . 7 . . 7 . . 7 . . . . . 
+            . . . . . 7 . 7 . 7 . . . . . . 
+            . . . . . . 7 7 7 . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            `, SpriteKind.snaper)
+        tiles.placeOnTile(snapey, value10)
+        tiles.setTileAt(value10, assets.tile`transparency16`)
+    }
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
@@ -797,6 +843,12 @@ function createPlayer (player2: Sprite) {
     info.setLife(3)
     info.setScore(0)
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.snaper, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    hero.say("ow", invincibilityPeriod)
+    music.powerDown.play()
+    pause(invincibilityPeriod)
+})
 function initializeLevel (level: number) {
     effects.clouds.startScreenEffect()
     playerStartLocation = tiles.getTilesByType(assets.tile`tile6`)[0]
@@ -805,11 +857,14 @@ function initializeLevel (level: number) {
     createEnemies()
     spawnGoals()
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`tile10`, function (sprite, location) {
+    lavaburn()
+})
 function hasNextLevel () {
     return currentLevel != levelCount
 }
 function spawnGoals () {
-    for (let value7 of tiles.getTilesByType(assets.tile`tile5`)) {
+    for (let value10 of tiles.getTilesByType(assets.tile`tile5`)) {
         coin = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -828,17 +883,19 @@ function spawnGoals () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.Coin)
-        tiles.placeOnTile(coin, value7)
+        tiles.placeOnTile(coin, value10)
         animation.attachAnimation(coin, coinAnimation)
         animation.setAction(coin, ActionKind.Idle)
-        tiles.setTileAt(value7, assets.tile`tile0`)
+        tiles.setTileAt(value10, assets.tile`tile0`)
     }
 }
 let heroFacingLeft = false
 let coin: Sprite = null
 let playerStartLocation: tiles.Location = null
+let snapey: Sprite = null
 let flier: Sprite = null
 let bumper: Sprite = null
+let lava = 0
 let mainCrouchRight: animation.Animation = null
 let mainCrouchLeft: animation.Animation = null
 let mainJumpRight: animation.Animation = null
@@ -852,6 +909,8 @@ let mainIdleLeft: animation.Animation = null
 let doubleJumpSpeed = 0
 let canDoubleJump = false
 let coinAnimation: animation.Animation = null
+let levelnumber = 0
+let world = 0
 let currentLevel = 0
 let levelCount = 0
 let gravity = 0
@@ -1005,44 +1064,13 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 8
+levelCount = 11
 currentLevel = 0
 setLevelTileMap(currentLevel)
 giveIntroduction()
-// set up hero animations
-game.onUpdate(function () {
-    if (hero.vx < 0) {
-        heroFacingLeft = true
-    } else if (hero.vx > 0) {
-        heroFacingLeft = false
-    }
-    if (hero.isHittingTile(CollisionDirection.Top)) {
-        hero.vy = 0
-    }
-    if (controller.down.isPressed()) {
-        if (heroFacingLeft) {
-            animation.setAction(hero, ActionKind.CrouchLeft)
-        } else {
-            animation.setAction(hero, ActionKind.CrouchRight)
-        }
-    } else if (hero.vy < 20 && !(hero.isHittingTile(CollisionDirection.Bottom))) {
-        if (heroFacingLeft) {
-            animation.setAction(hero, ActionKind.JumpingLeft)
-        } else {
-            animation.setAction(hero, ActionKind.JumpingRight)
-        }
-    } else if (hero.vx < 0) {
-        animation.setAction(hero, ActionKind.RunningLeft)
-    } else if (hero.vx > 0) {
-        animation.setAction(hero, ActionKind.RunningRight)
-    } else {
-        if (heroFacingLeft) {
-            animation.setAction(hero, ActionKind.IdleLeft)
-        } else {
-            animation.setAction(hero, ActionKind.IdleRight)
-        }
-    }
-})
+world = 1
+levelnumber = 1
+hero.say("" + world + "-" + levelnumber, 1000)
 // Flier movement
 game.onUpdate(function () {
     for (let value8 of sprites.allOfKind(SpriteKind.Flier)) {
@@ -1078,6 +1106,40 @@ game.onUpdate(function () {
             value9.vx = Math.randomRange(30, 60)
         } else if (value9.isHittingTile(CollisionDirection.Right)) {
             value9.vx = Math.randomRange(-60, -30)
+        }
+    }
+})
+// set up hero animations
+game.onUpdate(function () {
+    if (hero.vx < 0) {
+        heroFacingLeft = true
+    } else if (hero.vx > 0) {
+        heroFacingLeft = false
+    }
+    if (hero.isHittingTile(CollisionDirection.Top)) {
+        hero.vy = 0
+    }
+    if (controller.down.isPressed()) {
+        if (heroFacingLeft) {
+            animation.setAction(hero, ActionKind.CrouchLeft)
+        } else {
+            animation.setAction(hero, ActionKind.CrouchRight)
+        }
+    } else if (hero.vy < 20 && !(hero.isHittingTile(CollisionDirection.Bottom))) {
+        if (heroFacingLeft) {
+            animation.setAction(hero, ActionKind.JumpingLeft)
+        } else {
+            animation.setAction(hero, ActionKind.JumpingRight)
+        }
+    } else if (hero.vx < 0) {
+        animation.setAction(hero, ActionKind.RunningLeft)
+    } else if (hero.vx > 0) {
+        animation.setAction(hero, ActionKind.RunningRight)
+    } else {
+        if (heroFacingLeft) {
+            animation.setAction(hero, ActionKind.IdleLeft)
+        } else {
+            animation.setAction(hero, ActionKind.IdleRight)
         }
     }
 })
