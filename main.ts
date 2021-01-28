@@ -845,9 +845,9 @@ function createPlayer (player2: Sprite) {
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.snaper, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
-    hero.say("ow", invincibilityPeriod)
+    hero.say("ow", invincibilityPeriod * 1.5)
     music.powerDown.play()
-    pause(invincibilityPeriod)
+    pause(invincibilityPeriod * 1.5)
 })
 function initializeLevel (level: number) {
     effects.clouds.startScreenEffect()
