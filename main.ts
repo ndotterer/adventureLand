@@ -302,9 +302,11 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level2`)
     } else if (level == 10) {
         tiles.setTilemap(tilemap`level3`)
+    } else if (level == 11) {
+        tiles.setTilemap(tilemap`level4`)
     } else {
-        if (level == 11) {
-            tiles.setTilemap(tilemap`level4`)
+        if (level == 12) {
+            tiles.setTilemap(tilemap`level8`)
         }
     }
     initializeLevel(level)
@@ -702,6 +704,9 @@ function animateCrouch () {
         `)
 }
 function clearGame () {
+    for (let value of sprites.allOfKind(SpriteKind.snaper)) {
+        value.destroy()
+    }
     for (let value10 of sprites.allOfKind(SpriteKind.Bumper)) {
         value10.destroy()
     }
@@ -726,8 +731,6 @@ function lavaburn () {
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile1`, function (sprite, location) {
     info.changeLifeBy(1)
-    currentLevel += 1
-    levelnumber += 1
     if (bonus > 0) {
         game.splash("Next level unlocked!")
         if (game.ask("you got the cherry!", "go to bonus level?")) {
@@ -737,13 +740,6 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`tile1`, function (sprite, loc
         }
     } else {
         normalLevel()
-    }
-    if (levelnumber > 4) {
-        world += 1
-        levelnumber = 1
-    }
-    if (bonusPick < 1) {
-        hero.say("" + world + "-" + levelnumber, 1000)
     }
     bonus = 0
 })
@@ -879,28 +875,43 @@ function createEnemies () {
     }
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile17`, function (sprite, location) {
+    info.changeScoreBy(20)
     info.setLife(bonusLife)
-    currentLevel += 1
-    levelnumber += 1
     info.changeLifeBy(1)
-    if (levelnumber > 4) {
-        world += 1
-        levelnumber = 1
-    }
     normalLevel()
 })
 function normalLevel () {
+    currentLevel += 1
+    levelnumber += 1
     if (hasNextLevel()) {
-        game.splash("Next level unlocked!")
+        if (bonus < 1) {
+            game.splash("Next level unlocked!")
+        }
         setLevelTileMap(currentLevel)
     } else {
         game.over(true, effects.confetti)
     }
+    if (levelnumber > 4) {
+        world += 1
+        levelnumber = 1
+    }
     bonusPick = 0
+    hero.say("" + world + "-" + levelnumber, 1000)
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
         hero.vy += 80
+    }
+})
+info.onLifeZero(function () {
+    if (bonusPick > 0) {
+        bonusPick = 0
+        game.splash("oops. you failed the bonus level")
+        info.setLife(bonusLife)
+        bonusLife = 0
+        normalLevel()
+    } else {
+        game.over(false, effects.melt)
     }
 })
 function showInstruction (text: string) {
@@ -915,9 +926,10 @@ function initializeHeroAnimations () {
     animateJumps()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    otherSprite.destroy()
+    otherSprite.destroy(effects.confetti, 500)
     info.changeScoreBy(5)
     bonus = 1
+    music.magicWand.playUntilDone()
 })
 function createPlayer (player2: Sprite) {
     player2.ay = gravity
@@ -953,13 +965,15 @@ function bonusLevel () {
     if (world == 1) {
         tiles.setTilemap(tilemap`level5`)
     } else if (world == 2) {
-    	
+        tiles.setTilemap(tilemap`level6`)
     } else {
         if (world == 3) {
-        	
+            tiles.setTilemap(tilemap`level7`)
         }
     }
     hero.say("" + world + "-" + "bonus", 1000)
+    clearGame()
+    initializeLevel(currentLevel)
 }
 function spawnGoals () {
     for (let value10 of tiles.getTilesByType(assets.tile`tile5`)) {
@@ -1013,11 +1027,11 @@ let heroFacingLeft = false
 let cherry: Sprite = null
 let coin: Sprite = null
 let playerStartLocation: tiles.Location = null
+let bonusPick = 0
 let bonusLife = 0
 let snapey: Sprite = null
 let flier: Sprite = null
 let bumper: Sprite = null
-let bonusPick = 0
 let bonus = 0
 let lava = 0
 let mainCrouchRight: animation.Animation = null
@@ -1188,7 +1202,7 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 12
+levelCount = 13
 currentLevel = 0
 setLevelTileMap(currentLevel)
 giveIntroduction()
