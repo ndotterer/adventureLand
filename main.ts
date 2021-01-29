@@ -300,9 +300,11 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level1`)
     } else if (level == 9) {
         tiles.setTilemap(tilemap`level2`)
+    } else if (level == 10) {
+        tiles.setTilemap(tilemap`level3`)
     } else {
-        if (level == 10) {
-            tiles.setTilemap(tilemap`level3`)
+        if (level == 11) {
+            tiles.setTilemap(tilemap`level4`)
         }
     }
     initializeLevel(level)
@@ -712,6 +714,9 @@ function clearGame () {
     for (let value4 of sprites.allOfKind(SpriteKind.Flier)) {
         value4.destroy()
     }
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        value.destroy()
+    }
 }
 function lavaburn () {
     if (lava + 499 < game.runtime()) {
@@ -723,23 +728,37 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`tile1`, function (sprite, loc
     info.changeLifeBy(1)
     currentLevel += 1
     levelnumber += 1
+    if (bonus > 0) {
+        game.splash("Next level unlocked!")
+        if (game.ask("you got the cherry!", "go to bonus level?")) {
+            bonusLevel()
+        } else {
+            normalLevel()
+        }
+    } else {
+        normalLevel()
+    }
     if (levelnumber > 4) {
         world += 1
         levelnumber = 1
     }
-    hero.say("" + world + "-" + levelnumber, 1000)
-    if (hasNextLevel()) {
-        game.splash("Next level unlocked!")
-        setLevelTileMap(currentLevel)
-    } else {
-        game.over(true, effects.confetti)
+    if (bonusPick < 1) {
+        hero.say("" + world + "-" + levelnumber, 1000)
     }
+    bonus = 0
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Flier, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
     sprite.say("Ow!", invincibilityPeriod * 1.5)
     music.powerDown.play()
     pause(invincibilityPeriod * 1.5)
+})
+scene.onOverlapTile(SpriteKind.Bumper, assets.tile`tile16`, function (sprite, location) {
+    if (sprite.tileKindAt(TileDirection.Left, assets.tile`tile16`)) {
+        sprite.vx = Math.randomRange(30, 60)
+    } else if (sprite.tileKindAt(TileDirection.Right, assets.tile`tile16`)) {
+        sprite.vx = Math.randomRange(-60, -30)
+    }
 })
 function createEnemies () {
     // enemy that moves back and forth
@@ -817,7 +836,67 @@ function createEnemies () {
             `, SpriteKind.snaper)
         tiles.placeOnTile(snapey, value10)
         tiles.setTileAt(value10, assets.tile`transparency16`)
+        animation.runImageAnimation(
+        snapey,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . a a 1 . . . 1 a a . . . . 
+            . . . a a . . . . . a a . . . . 
+            . . . . a a 1 . 1 a a . . . . . 
+            . . . . a a . . . a a . . . . . 
+            . . . . . a a . a a . . . . . . 
+            . . . . . a a 1 a a . . . . . . 
+            . . . . . . a a a . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            . . . . 7 . . 7 . . 7 . . . . . 
+            . . . . . 7 . 7 . 7 . . . . . . 
+            . . . . . . 7 7 7 . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . a c a . . . . . . . 
+            . . . . . a a c a a . . . . . . 
+            . . . . a a a 1 a a a . . . . . 
+            . . . . a a a c a a a . . . . . 
+            . . . . a a a c a a a . . . . . 
+            . . . . . a a 1 a a . . . . . . 
+            . . . . . a a c a a . . . . . . 
+            . . . . . . a c a . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            . . . . 7 . . 7 . . 7 . . . . . 
+            . . . . . 7 . 7 . 7 . . . . . . 
+            . . . . . . 7 7 7 . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            `],
+        200,
+        true
+        )
     }
+}
+scene.onOverlapTile(SpriteKind.Player, assets.tile`tile17`, function (sprite, location) {
+    info.setLife(bonusLife)
+    currentLevel += 1
+    levelnumber += 1
+    info.changeLifeBy(1)
+    if (levelnumber > 4) {
+        world += 1
+        levelnumber = 1
+    }
+    normalLevel()
+})
+function normalLevel () {
+    if (hasNextLevel()) {
+        game.splash("Next level unlocked!")
+        setLevelTileMap(currentLevel)
+    } else {
+        game.over(true, effects.confetti)
+    }
+    bonusPick = 0
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
@@ -835,6 +914,11 @@ function initializeHeroAnimations () {
     animateCrouch()
     animateJumps()
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    otherSprite.destroy()
+    info.changeScoreBy(5)
+    bonus = 1
+})
 function createPlayer (player2: Sprite) {
     player2.ay = gravity
     scene.cameraFollowSprite(player2)
@@ -863,6 +947,20 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`tile10`, function (sprite, lo
 function hasNextLevel () {
     return currentLevel != levelCount
 }
+function bonusLevel () {
+    bonusLife = info.life()
+    bonusPick = 1
+    if (world == 1) {
+        tiles.setTilemap(tilemap`level5`)
+    } else if (world == 2) {
+    	
+    } else {
+        if (world == 3) {
+        	
+        }
+    }
+    hero.say("" + world + "-" + "bonus", 1000)
+}
 function spawnGoals () {
     for (let value10 of tiles.getTilesByType(assets.tile`tile5`)) {
         coin = sprites.create(img`
@@ -888,13 +986,39 @@ function spawnGoals () {
         animation.setAction(coin, ActionKind.Idle)
         tiles.setTileAt(value10, assets.tile`tile0`)
     }
+    for (let value of tiles.getTilesByType(assets.tile`tile15`)) {
+        cherry = sprites.create(img`
+            . . . . . . . . . . . 6 6 6 6 6 
+            . . . . . . . . . 6 6 7 7 7 7 8 
+            . . . . . . 8 8 8 7 7 8 8 6 8 8 
+            . . e e e e c 6 6 8 8 . 8 7 8 . 
+            . e 2 5 4 2 e c 8 . . . 6 7 8 . 
+            e 2 4 2 2 2 2 2 c . . . 6 7 8 . 
+            e 2 2 2 2 2 2 2 c . . . 8 6 8 . 
+            e 2 e e 2 2 2 2 e e e e c 6 8 . 
+            c 2 e e 2 2 2 2 e 2 5 4 2 c 8 . 
+            . c 2 e e e 2 e 2 4 2 2 2 2 c . 
+            . . c 2 2 2 e e 2 2 2 2 2 2 2 e 
+            . . . e c c e c 2 2 2 2 2 2 2 e 
+            . . . . . . . c 2 e e 2 2 e 2 c 
+            . . . . . . . c e e e e e e 2 c 
+            . . . . . . . . c e 2 2 2 2 c . 
+            . . . . . . . . . c c c c c . . 
+            `, SpriteKind.Food)
+        tiles.placeOnTile(cherry, value)
+        tiles.setTileAt(value, assets.tile`transparency16`)
+    }
 }
 let heroFacingLeft = false
+let cherry: Sprite = null
 let coin: Sprite = null
 let playerStartLocation: tiles.Location = null
+let bonusLife = 0
 let snapey: Sprite = null
 let flier: Sprite = null
 let bumper: Sprite = null
+let bonusPick = 0
+let bonus = 0
 let lava = 0
 let mainCrouchRight: animation.Animation = null
 let mainCrouchLeft: animation.Animation = null
@@ -1064,7 +1188,7 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 11
+levelCount = 12
 currentLevel = 0
 setLevelTileMap(currentLevel)
 giveIntroduction()
