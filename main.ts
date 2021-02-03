@@ -363,6 +363,7 @@ function setLevelTileMap (level: number) {
     } else {
         if (level == 15) {
             tiles.setTilemap(tilemap`level13`)
+            createBoss()
         }
     }
     initializeLevel(level)
@@ -829,6 +830,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.hardHatBumper, function (sprite,
         music.powerDown.play()
     }
     pause(invincibilityPeriod)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.flierBoss, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    hero.say("ow", invincibilityPeriod * 1.5)
+    music.powerDown.play()
+    pause(invincibilityPeriod * 1.5)
 })
 function createEnemies () {
     // enemy that moves back and forth
