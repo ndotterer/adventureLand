@@ -20,6 +20,7 @@ namespace SpriteKind {
     export const snaper = SpriteKind.create()
     export const hardHatBumper = SpriteKind.create()
     export const flierBoss = SpriteKind.create()
+    export const blueflier = SpriteKind.create()
 }
 function createBoss () {
     for (let value of tiles.getTilesByType(assets.tile`tile22`)) {
@@ -67,6 +68,7 @@ function initializeAnimations () {
     initializeHeroAnimations()
     initializeCoinAnimation()
     initializeFlierAnimations()
+    initializeblueFlierAnimations()
 }
 function giveIntroduction () {
     game.setDialogFrame(img`
@@ -360,11 +362,12 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level9`)
     } else if (level == 14) {
         tiles.setTilemap(tilemap`level12`)
-    } else {
-        if (level == 15) {
-            tiles.setTilemap(tilemap`level13`)
-            createBoss()
-        }
+    } else if (level == 15) {
+        tiles.setTilemap(tilemap`level13`)
+    } else if (level == 16) {
+        tiles.setTilemap(tilemap`level14`)
+    } else if (level == 17) {
+        tiles.setTilemap(tilemap`level15`)
     }
     initializeLevel(level)
 }
@@ -982,6 +985,13 @@ function createEnemies () {
             hatBumper.vx = Math.randomRange(-60, -30)
         }
     }
+    for (let value of tiles.getTilesByType(assets.tile`Temporary asset`)) {
+        mySprite = sprites.create(assets.tile`Temporary asset`, SpriteKind.blueflier)
+        tiles.placeOnTile(mySprite, value)
+        tiles.setTileAt(value, assets.tile`transparency16`)
+        animation.attachAnimation(mySprite, blueFlierFlying)
+        animation.attachAnimation(flier, blueFlierIdle)
+    }
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile17`, function (sprite, location) {
     info.changeScoreBy(20)
@@ -1059,6 +1069,7 @@ function initializeLevel (level: number) {
     tiles.placeOnTile(hero, playerStartLocation)
     tiles.setTileAt(playerStartLocation, assets.tile`tile0`)
     createEnemies()
+    createBoss()
     spawnGoals()
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile10`, function (sprite, location) {
@@ -1070,6 +1081,82 @@ scene.onOverlapTile(SpriteKind.flierBoss, assets.tile`tile`, function (sprite, l
 })
 function hasNextLevel () {
     return currentLevel != levelCount
+}
+function initializeblueFlierAnimations () {
+    flierFlying = animation.createAnimation(ActionKind.Flying, 100)
+    blueFlierFlying.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 9 9 9 9 9 9 9 f . . . 
+        . . . f 9 6 6 9 9 9 6 6 9 f . . 
+        . f . f 9 9 9 6 9 6 9 9 9 f . f 
+        . f f 9 9 9 9 9 9 9 9 9 9 9 f f 
+        . f 9 9 9 9 9 6 9 6 9 9 9 9 9 f 
+        . f 9 9 9 9 9 6 9 6 9 9 9 9 9 f 
+        . f f 9 9 9 9 9 9 9 9 9 9 9 f f 
+        . . . f 9 9 6 6 6 6 6 9 9 f . . 
+        . . . . f 9 6 9 9 9 6 9 f . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
+    blueFlierFlying.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 9 9 9 9 9 9 9 f . . . 
+        . . . f 9 6 6 9 9 9 6 6 9 f . . 
+        . . . f 9 9 9 6 9 6 9 9 9 f . . 
+        . . f 9 9 9 9 9 9 9 9 9 9 9 f . 
+        . . f 9 9 9 9 6 9 6 9 9 9 9 f . 
+        . f 9 9 9 9 9 6 9 6 9 9 9 9 9 f 
+        . f 9 9 9 9 9 9 9 9 9 9 9 9 9 f 
+        . f 9 f 9 9 6 6 6 6 6 9 9 f 9 f 
+        . f f . f 9 6 9 9 9 6 9 f . f f 
+        . f . . . f f f f f f f . . . f 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
+    blueFlierFlying.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 4 4 4 4 4 4 4 f . . . 
+        . . . f 4 5 5 4 4 4 5 5 4 f . . 
+        . f . f 4 4 4 5 4 5 4 4 4 f . f 
+        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
+        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
+        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
+        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
+        . . . f 4 4 5 5 5 5 5 4 4 f . . 
+        . . . . f 4 5 4 4 4 5 4 f . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
+    flierIdle = animation.createAnimation(ActionKind.Idle, 100)
+    blueFlierIdle.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 4 4 4 4 4 4 4 f . . . 
+        . . . f 4 5 5 4 4 4 5 5 4 f . . 
+        . f . f 4 4 4 5 4 5 4 4 4 f . f 
+        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
+        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
+        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
+        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
+        . . . f 4 4 5 5 5 5 5 4 4 f . . 
+        . . . . f 4 5 4 4 4 5 4 f . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
 }
 scene.onOverlapTile(SpriteKind.hardHatBumper, assets.tile`tile`, function (sprite, location) {
     sprite.destroy(effects.fire, 500)
@@ -1147,6 +1234,9 @@ let coin: Sprite = null
 let playerStartLocation: tiles.Location = null
 let bonusPick = 0
 let bonusLife = 0
+let blueFlierIdle: animation.Animation = null
+let blueFlierFlying: animation.Animation = null
+let mySprite: Sprite = null
 let hatBumper: Sprite = null
 let snapey: Sprite = null
 let flier: Sprite = null
@@ -1323,35 +1413,13 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 16
+levelCount = 18
 currentLevel = 0
 setLevelTileMap(currentLevel)
 giveIntroduction()
 world = 1
 levelnumber = 1
 hero.say("" + world + "-" + levelnumber, 1000)
-// Flier movement
-game.onUpdate(function () {
-    for (let value8 of sprites.allOfKind(SpriteKind.Flier)) {
-        if (Math.abs(value8.x - hero.x) < 60) {
-            if (value8.x - hero.x < -5) {
-                value8.vx = 25
-            } else if (value8.x - hero.x > 5) {
-                value8.vx = -25
-            }
-            if (value8.y - hero.y < -5) {
-                value8.vy = 25
-            } else if (value8.y - hero.y > 5) {
-                value8.vy = -25
-            }
-            animation.setAction(value8, ActionKind.Flying)
-        } else {
-            value8.vy = -20
-            value8.vx = 0
-            animation.setAction(value8, ActionKind.Idle)
-        }
-    }
-})
 // Reset double jump when standing on wall
 game.onUpdate(function () {
     if (hero.isHittingTile(CollisionDirection.Bottom)) {
@@ -1378,6 +1446,48 @@ game.onUpdate(function () {
     }
 })
 // Flier movement
+game.onUpdate(function () {
+    for (let value8 of sprites.allOfKind(SpriteKind.Flier)) {
+        if (Math.abs(value8.x - hero.x) < 60) {
+            if (value8.x - hero.x < -5) {
+                value8.vx = 25
+            } else if (value8.x - hero.x > 5) {
+                value8.vx = -25
+            }
+            if (value8.y - hero.y < -5) {
+                value8.vy = 25
+            } else if (value8.y - hero.y > 5) {
+                value8.vy = -25
+            }
+            animation.setAction(value8, ActionKind.Flying)
+        } else {
+            value8.vy = -20
+            value8.vx = 0
+            animation.setAction(value8, ActionKind.Idle)
+        }
+    }
+})
+game.onUpdate(function () {
+    for (let value8 of sprites.allOfKind(SpriteKind.blueflier)) {
+        if (Math.abs(value8.x - hero.x) < 60) {
+            if (value8.x - hero.x < -5) {
+                value8.vx = 25
+            } else if (value8.x - hero.x > 5) {
+                value8.vx = -25
+            }
+            if (value8.y - hero.y < -5) {
+                value8.vy = 25
+            } else if (value8.y - hero.y > 5) {
+                value8.vy = -25
+            }
+            animation.setAction(value8, ActionKind.Flying)
+        } else {
+            value8.vy = -20
+            value8.vx = 0
+            animation.setAction(value8, ActionKind.Idle)
+        }
+    }
+})
 game.onUpdate(function () {
     for (let value8 of sprites.allOfKind(SpriteKind.flierBoss)) {
         if (Math.abs(value8.x - hero.x) < 60) {
