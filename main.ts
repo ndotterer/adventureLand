@@ -108,12 +108,9 @@ function giveIntroduction () {
         . . . . . . . . . . . . . . . . 
         `)
     showInstruction("Move with the left and right buttons.")
-    showInstruction("Jump with the up or A button.")
+    showInstruction("Jump with the A button.")
     showInstruction("Double jump by pressing jump again.")
 }
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump()
-})
 function initializeCoinAnimation () {
     coinAnimation = animation.createAnimation(ActionKind.Idle, 200)
     coinAnimation.addAnimationFrame(img`
@@ -260,7 +257,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`tile21`, function (sprite, lo
     if (boss < 1) {
         info.changeLifeBy(1)
         if (bonus > 0) {
-            game.splash("Next level unlocked!")
+            game.splash("congratilitions")
             if (game.ask("you got the cherry!", "go to bonus level?")) {
                 bonusLevel()
             } else {
@@ -330,10 +327,25 @@ function animateIdle () {
         . . . . f f f . . f f f . . . . 
         `)
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile`, function (sprite, location) {
+    if (info.life() < 8) {
+        info.changeLifeBy(1)
+    }
+    if (bonus > 0) {
+        game.splash("Next level unlocked!")
+        if (game.ask("you got the cherry!", "go to bonus level?")) {
+            bonusLevel()
+        } else {
+            normalLevel()
+        }
+    } else {
+        normalLevel()
+    }
+    bonus = 0
+})
 function setLevelTileMap (level: number) {
-    clearGame()
     if (level == 0) {
-        tiles.setTilemap(tilemap`level`)
+        tiles.setTilemap(tilemap`level17`)
     } else if (level == 1) {
         tiles.setTilemap(tilemap`level_0`)
     } else if (level == 2) {
@@ -368,8 +380,13 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level14`)
     } else if (level == 17) {
         tiles.setTilemap(tilemap`level15`)
+    } else {
+        if (level == 18) {
+            tiles.setTilemap(tilemap`level17`)
+        }
     }
     initializeLevel(level)
+    clearGame()
 }
 function initializeFlierAnimations () {
     flierFlying = animation.createAnimation(ActionKind.Flying, 100)
@@ -665,7 +682,7 @@ function animateJumps () {
             . . . . . . . . . . . . . . . . 
             `)
     }
-    mainJumpRight = animation.createAnimation(ActionKind.JumpingRight, 100)
+    mainJumpRight = animation.createAnimation(ActionKind.Walking, 100)
     animation.attachAnimation(hero, mainJumpRight)
     mainJumpRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
@@ -795,22 +812,6 @@ function lavaburn () {
         lava = game.runtime()
     }
 }
-scene.onOverlapTile(SpriteKind.Player, assets.tile`tile1`, function (sprite, location) {
-    if (info.life() < 8) {
-        info.changeLifeBy(1)
-    }
-    if (bonus > 0) {
-        game.splash("Next level unlocked!")
-        if (game.ask("you got the cherry!", "go to bonus level?")) {
-            bonusLevel()
-        } else {
-            normalLevel()
-        }
-    } else {
-        normalLevel()
-    }
-    bonus = 0
-})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Flier, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
     sprite.say("Ow!", invincibilityPeriod * 1.5)
@@ -1083,8 +1084,63 @@ function hasNextLevel () {
     return currentLevel != levelCount
 }
 function initializeblueFlierAnimations () {
-    flierFlying = animation.createAnimation(ActionKind.Flying, 100)
+    blueFlierFlying = animation.createAnimation(ActionKind.Flying, 100)
     blueFlierFlying.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 8 8 8 8 8 8 8 f . . . 
+        . . . f 8 6 6 8 8 8 6 6 8 f . . 
+        . f . f 8 8 8 6 8 6 8 8 8 f . f 
+        . f f 8 8 8 8 8 8 8 8 8 8 8 f f 
+        . f 8 8 8 8 8 6 8 6 8 8 8 8 8 f 
+        . f 8 8 8 8 8 6 8 6 8 8 8 8 8 f 
+        . f f 8 8 8 8 8 8 8 8 8 8 8 f f 
+        . . . f 8 8 6 6 6 6 6 8 8 f . . 
+        . . . . f 8 6 8 8 8 6 8 f . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
+    blueFlierFlying.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 8 8 8 8 8 8 8 f . . . 
+        . . . f 8 6 6 8 8 8 6 6 8 f . . 
+        . . . f 8 8 8 6 8 6 8 8 8 f . . 
+        . . f 8 8 8 8 8 8 8 8 8 8 8 f . 
+        . . f 8 8 8 8 6 8 6 8 8 8 8 f . 
+        . f 8 8 8 8 8 6 8 6 8 8 8 8 8 f 
+        . f 8 8 8 8 8 8 8 8 8 8 8 8 8 f 
+        . f 8 f 8 8 6 6 6 6 6 8 8 f 8 f 
+        . f f . f 8 6 8 8 8 6 8 f . f f 
+        . f . . . f f f f f f f . . . f 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
+    blueFlierFlying.addAnimationFrame(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . f 8 8 8 8 8 8 8 f . . . 
+        . . . f 8 6 6 8 8 8 6 6 8 f . . 
+        . f . f 8 8 8 6 8 6 8 8 8 f . f 
+        . f f 8 8 8 8 8 8 8 8 8 8 8 f f 
+        . f 8 8 8 8 8 6 8 6 8 8 8 8 8 f 
+        . f 8 8 8 8 8 6 8 6 8 8 8 8 8 f 
+        . f f 8 8 8 8 8 8 8 8 8 8 8 f f 
+        . . . f 8 8 6 6 6 6 6 8 8 f . . 
+        . . . . f 8 6 8 8 8 6 8 f . . . 
+        . . . . . f f f f f f f . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `)
+    blueFlierIdle = animation.createAnimation(ActionKind.Idle, 100)
+    blueFlierIdle.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -1102,61 +1158,6 @@ function initializeblueFlierAnimations () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         `)
-    blueFlierFlying.addAnimationFrame(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . f f f f f f f . . . . 
-        . . . . f 9 9 9 9 9 9 9 f . . . 
-        . . . f 9 6 6 9 9 9 6 6 9 f . . 
-        . . . f 9 9 9 6 9 6 9 9 9 f . . 
-        . . f 9 9 9 9 9 9 9 9 9 9 9 f . 
-        . . f 9 9 9 9 6 9 6 9 9 9 9 f . 
-        . f 9 9 9 9 9 6 9 6 9 9 9 9 9 f 
-        . f 9 9 9 9 9 9 9 9 9 9 9 9 9 f 
-        . f 9 f 9 9 6 6 6 6 6 9 9 f 9 f 
-        . f f . f 9 6 9 9 9 6 9 f . f f 
-        . f . . . f f f f f f f . . . f 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `)
-    blueFlierFlying.addAnimationFrame(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . f f f f f f f . . . . 
-        . . . . f 4 4 4 4 4 4 4 f . . . 
-        . . . f 4 5 5 4 4 4 5 5 4 f . . 
-        . f . f 4 4 4 5 4 5 4 4 4 f . f 
-        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
-        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
-        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
-        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
-        . . . f 4 4 5 5 5 5 5 4 4 f . . 
-        . . . . f 4 5 4 4 4 5 4 f . . . 
-        . . . . . f f f f f f f . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `)
-    flierIdle = animation.createAnimation(ActionKind.Idle, 100)
-    blueFlierIdle.addAnimationFrame(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . f f f f f f f . . . . 
-        . . . . f 4 4 4 4 4 4 4 f . . . 
-        . . . f 4 5 5 4 4 4 5 5 4 f . . 
-        . f . f 4 4 4 5 4 5 4 4 4 f . f 
-        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
-        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
-        . f 4 4 4 4 4 5 4 5 4 4 4 4 4 f 
-        . f f 4 4 4 4 4 4 4 4 4 4 4 f f 
-        . . . f 4 4 5 5 5 5 5 4 4 f . . 
-        . . . . f 4 5 4 4 4 5 4 f . . . 
-        . . . . . f f f f f f f . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `)
 }
 scene.onOverlapTile(SpriteKind.hardHatBumper, assets.tile`tile`, function (sprite, location) {
     sprite.destroy(effects.fire, 500)
@@ -1170,9 +1171,11 @@ function bonusLevel () {
         tiles.setTilemap(tilemap`level6`)
     } else if (world == 3) {
         tiles.setTilemap(tilemap`level7`)
+    } else if (world == 4) {
+        tiles.setTilemap(tilemap`level11`)
     } else {
-        if (world == 4) {
-            tiles.setTilemap(tilemap`level11`)
+        if (world == 5) {
+            tiles.setTilemap(tilemap`level18`)
         }
     }
     hero.say("" + world + "-" + "bonus", 1000)
@@ -1284,8 +1287,6 @@ hero = sprites.create(img`
     . . . f b a a f f b a a f . . . 
     . . . . f f f . . f f f . . . . 
     `, SpriteKind.Player)
-// how long to pause between each contact with a
-// single enemy
 invincibilityPeriod = 600
 pixelsToMeters = 30
 gravity = 9.81 * pixelsToMeters
@@ -1413,12 +1414,12 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 18
+levelCount = 19
 currentLevel = 0
-setLevelTileMap(currentLevel)
-giveIntroduction()
 world = 1
 levelnumber = 1
+giveIntroduction()
+setLevelTileMap(currentLevel)
 hero.say("" + world + "-" + levelnumber, 1000)
 // Reset double jump when standing on wall
 game.onUpdate(function () {
