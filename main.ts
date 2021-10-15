@@ -785,6 +785,9 @@ function clearGame () {
     for (let value10 of sprites.allOfKind(SpriteKind.Bumper)) {
         value10.destroy()
     }
+    for (let value10 of sprites.allOfKind(SpriteKind.hardHatBumper)) {
+        value10.destroy()
+    }
     for (let value2 of sprites.allOfKind(SpriteKind.Coin)) {
         value2.destroy()
     }
