@@ -328,24 +328,11 @@ function animateIdle () {
         `)
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile`, function (sprite, location) {
-    if (info.life() < 8) {
-        info.changeLifeBy(1)
-    }
-    if (bonus > 0) {
-        game.splash("Next level unlocked!")
-        if (game.ask("you got the cherry!", "go to bonus level?")) {
-            bonusLevel()
-        } else {
-            normalLevel()
-        }
-    } else {
-        normalLevel()
-    }
-    bonus = 0
+    lavaburn()
 })
 function setLevelTileMap (level: number) {
     if (level == 0) {
-        tiles.setTilemap(tilemap`level17`)
+        tiles.setTilemap(tilemap`level`)
     } else if (level == 1) {
         tiles.setTilemap(tilemap`level_0`)
     } else if (level == 2) {
@@ -380,13 +367,15 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level14`)
     } else if (level == 17) {
         tiles.setTilemap(tilemap`level15`)
+    } else if (level == 18) {
+        tiles.setTilemap(tilemap`level17`)
     } else {
-        if (level == 18) {
-            tiles.setTilemap(tilemap`level17`)
+        if (level == 19) {
+            tiles.setTilemap(tilemap`level19`)
         }
     }
-    initializeLevel(level)
     clearGame()
+    initializeLevel(level)
 }
 function initializeFlierAnimations () {
     flierFlying = animation.createAnimation(ActionKind.Flying, 100)
@@ -741,6 +730,9 @@ function animateJumps () {
             `)
     }
 }
+scene.onOverlapTile(SpriteKind.Bumper, assets.tile`myTile`, function (sprite, location) {
+    sprite.destroy(effects.rings, 500)
+})
 function animateCrouch () {
     mainCrouchLeft = animation.createAnimation(ActionKind.CrouchLeft, 100)
     animation.attachAnimation(hero, mainCrouchLeft)
@@ -805,6 +797,9 @@ function clearGame () {
     for (let value of sprites.allOfKind(SpriteKind.Food)) {
         value.destroy()
     }
+    for (let value of sprites.allOfKind(SpriteKind.blueflier)) {
+        value.destroy()
+    }
 }
 function lavaburn () {
     if (lava + 499 < game.runtime()) {
@@ -812,6 +807,22 @@ function lavaburn () {
         lava = game.runtime()
     }
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`tile1`, function (sprite, location) {
+    if (info.life() < 8) {
+        info.changeLifeBy(1)
+    }
+    if (bonus > 0) {
+        game.splash("Next level unlocked!")
+        if (game.ask("you got the cherry!", "go to bonus level?")) {
+            bonusLevel()
+        } else {
+            normalLevel()
+        }
+    } else {
+        normalLevel()
+    }
+    bonus = 0
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Flier, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
     sprite.say("Ow!", invincibilityPeriod * 1.5)
@@ -991,7 +1002,7 @@ function createEnemies () {
         tiles.placeOnTile(mySprite, value)
         tiles.setTileAt(value, assets.tile`transparency16`)
         animation.attachAnimation(mySprite, blueFlierFlying)
-        animation.attachAnimation(flier, blueFlierIdle)
+        animation.attachAnimation(mySprite, blueFlierIdle)
     }
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile17`, function (sprite, location) {
@@ -1023,6 +1034,9 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         hero.vy += 80
     }
 })
+scene.onOverlapTile(SpriteKind.Flier, assets.tile`myTile`, function (sprite, location) {
+    sprite.destroy(effects.rings, 500)
+})
 info.onLifeZero(function () {
     if (bonusPick > 0) {
         bonusPick = 0
@@ -1038,6 +1052,12 @@ function showInstruction (text: string) {
     game.showLongText(text, DialogLayout.Bottom)
     music.baDing.play()
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.blueflier, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    hero.say("ow", invincibilityPeriod * 1.5)
+    music.powerDown.play()
+    pause(invincibilityPeriod * 1.5)
+})
 function initializeHeroAnimations () {
     animateRun()
     animateIdle()
@@ -1414,7 +1434,7 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 19
+levelCount = 20
 currentLevel = 0
 world = 1
 levelnumber = 1
