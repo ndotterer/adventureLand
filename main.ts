@@ -22,6 +22,11 @@ namespace SpriteKind {
     export const flierBoss = SpriteKind.create()
     export const blueflier = SpriteKind.create()
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
+    water = 2
+    inWater = game.runtime()
+    canDoubleJump = true
+})
 function createBoss () {
     for (let value of tiles.getTilesByType(assets.tile`tile22`)) {
         redFlier = sprites.create(img`
@@ -257,7 +262,6 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`tile21`, function (sprite, lo
     if (boss < 1) {
         info.changeLifeBy(1)
         if (bonus > 0) {
-            game.splash("congratilitions")
             if (game.ask("you got the cherry!", "go to bonus level?")) {
                 bonusLevel()
             } else {
@@ -272,7 +276,7 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`tile21`, function (sprite, lo
 function attemptJump () {
     // else if: either fell off a ledge, or double jumping
     if (hero.isHittingTile(CollisionDirection.Bottom)) {
-        hero.vy = -4 * pixelsToMeters
+        hero.vy = -4 * pixelsToMeters / water
     } else if (canDoubleJump) {
         doubleJumpSpeed = -3 * pixelsToMeters
         // Good double jump
@@ -281,7 +285,7 @@ function attemptJump () {
             hero.startEffect(effects.trail, 500)
             scene.cameraShake(2, 250)
         }
-        hero.vy = doubleJumpSpeed
+        hero.vy = doubleJumpSpeed / water
         canDoubleJump = false
     }
 }
@@ -369,9 +373,11 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level15`)
     } else if (level == 18) {
         tiles.setTilemap(tilemap`level17`)
+    } else if (level == 19) {
+        tiles.setTilemap(tilemap`level19`)
     } else {
-        if (level == 19) {
-            tiles.setTilemap(tilemap`level19`)
+        if (level == 20) {
+            tiles.setTilemap(tilemap`level20`)
         }
     }
     clearGame()
@@ -779,17 +785,17 @@ scene.onOverlapTile(SpriteKind.Bumper, assets.tile`tile`, function (sprite, loca
     sprite.destroy(effects.fire, 500)
 })
 function clearGame () {
-    for (let value of sprites.allOfKind(SpriteKind.snaper)) {
-        value.destroy()
+    for (let value2 of sprites.allOfKind(SpriteKind.snaper)) {
+        value2.destroy()
     }
     for (let value10 of sprites.allOfKind(SpriteKind.Bumper)) {
         value10.destroy()
     }
-    for (let value10 of sprites.allOfKind(SpriteKind.hardHatBumper)) {
-        value10.destroy()
+    for (let value102 of sprites.allOfKind(SpriteKind.hardHatBumper)) {
+        value102.destroy()
     }
-    for (let value2 of sprites.allOfKind(SpriteKind.Coin)) {
-        value2.destroy()
+    for (let value22 of sprites.allOfKind(SpriteKind.Coin)) {
+        value22.destroy()
     }
     for (let value3 of sprites.allOfKind(SpriteKind.Goal)) {
         value3.destroy()
@@ -797,13 +803,18 @@ function clearGame () {
     for (let value4 of sprites.allOfKind(SpriteKind.Flier)) {
         value4.destroy()
     }
-    for (let value of sprites.allOfKind(SpriteKind.Food)) {
-        value.destroy()
+    for (let value5 of sprites.allOfKind(SpriteKind.Food)) {
+        value5.destroy()
     }
-    for (let value of sprites.allOfKind(SpriteKind.blueflier)) {
-        value.destroy()
+    for (let value6 of sprites.allOfKind(SpriteKind.blueflier)) {
+        value6.destroy()
     }
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`tile26`, function (sprite, location) {
+    water = 2
+    inWater = game.runtime()
+    canDoubleJump = true
+})
 function lavaburn () {
     if (lava + 499 < game.runtime()) {
         info.changeLifeBy(-1)
@@ -857,7 +868,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.flierBoss, function (sprite, oth
 })
 function createEnemies () {
     // enemy that moves back and forth
-    for (let value5 of tiles.getTilesByType(assets.tile`tile4`)) {
+    for (let value52 of tiles.getTilesByType(assets.tile`tile4`)) {
         bumper = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -876,8 +887,8 @@ function createEnemies () {
             . . . . . . f f f f f f f . . . 
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.Bumper)
-        tiles.placeOnTile(bumper, value5)
-        tiles.setTileAt(value5, assets.tile`tile0`)
+        tiles.placeOnTile(bumper, value52)
+        tiles.setTileAt(value52, assets.tile`tile0`)
         bumper.ay = gravity
         if (Math.percentChance(50)) {
             bumper.vx = Math.randomRange(30, 60)
@@ -886,7 +897,7 @@ function createEnemies () {
         }
     }
     // enemy that flies at player
-    for (let value6 of tiles.getTilesByType(assets.tile`tile7`)) {
+    for (let value62 of tiles.getTilesByType(assets.tile`tile7`)) {
         flier = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -905,12 +916,12 @@ function createEnemies () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.Flier)
-        tiles.placeOnTile(flier, value6)
-        tiles.setTileAt(value6, assets.tile`tile0`)
+        tiles.placeOnTile(flier, value62)
+        tiles.setTileAt(value62, assets.tile`tile0`)
         animation.attachAnimation(flier, flierFlying)
         animation.attachAnimation(flier, flierIdle)
     }
-    for (let value10 of tiles.getTilesByType(assets.tile`tile13`)) {
+    for (let value103 of tiles.getTilesByType(assets.tile`tile13`)) {
         snapey = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -929,8 +940,8 @@ function createEnemies () {
             . . . . . . 7 7 7 . . . . . . . 
             . . . . . . . 7 . . . . . . . . 
             `, SpriteKind.snaper)
-        tiles.placeOnTile(snapey, value10)
-        tiles.setTileAt(value10, assets.tile`transparency16`)
+        tiles.placeOnTile(snapey, value103)
+        tiles.setTileAt(value103, assets.tile`transparency16`)
         animation.runImageAnimation(
         snapey,
         [img`
@@ -972,7 +983,7 @@ function createEnemies () {
         true
         )
     }
-    for (let value of tiles.getTilesByType(assets.tile`tile18`)) {
+    for (let value7 of tiles.getTilesByType(assets.tile`tile18`)) {
         hatBumper = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . 2 2 2 2 2 2 . . . . . . 
@@ -991,8 +1002,8 @@ function createEnemies () {
             . . . . . . f f f f f f f . . . 
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.hardHatBumper)
-        tiles.placeOnTile(hatBumper, value)
-        tiles.setTileAt(value, assets.tile`transparency16`)
+        tiles.placeOnTile(hatBumper, value7)
+        tiles.setTileAt(value7, assets.tile`transparency16`)
         hatBumper.ay = gravity
         if (Math.percentChance(50)) {
             hatBumper.vx = Math.randomRange(30, 60)
@@ -1000,10 +1011,10 @@ function createEnemies () {
             hatBumper.vx = Math.randomRange(-60, -30)
         }
     }
-    for (let value of tiles.getTilesByType(assets.tile`Temporary asset`)) {
+    for (let value8 of tiles.getTilesByType(assets.tile`Temporary asset`)) {
         mySprite = sprites.create(assets.tile`Temporary asset`, SpriteKind.blueflier)
-        tiles.placeOnTile(mySprite, value)
-        tiles.setTileAt(value, assets.tile`transparency16`)
+        tiles.placeOnTile(mySprite, value8)
+        tiles.setTileAt(value8, assets.tile`transparency16`)
         animation.attachAnimation(mySprite, blueFlierFlying)
         animation.attachAnimation(mySprite, blueFlierIdle)
     }
@@ -1206,7 +1217,7 @@ function bonusLevel () {
     initializeLevel(currentLevel)
 }
 function spawnGoals () {
-    for (let value10 of tiles.getTilesByType(assets.tile`tile5`)) {
+    for (let value104 of tiles.getTilesByType(assets.tile`tile5`)) {
         coin = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -1225,12 +1236,12 @@ function spawnGoals () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.Coin)
-        tiles.placeOnTile(coin, value10)
+        tiles.placeOnTile(coin, value104)
         animation.attachAnimation(coin, coinAnimation)
         animation.setAction(coin, ActionKind.Idle)
-        tiles.setTileAt(value10, assets.tile`tile0`)
+        tiles.setTileAt(value104, assets.tile`tile0`)
     }
-    for (let value of tiles.getTilesByType(assets.tile`tile15`)) {
+    for (let value9 of tiles.getTilesByType(assets.tile`tile15`)) {
         cherry = sprites.create(img`
             . . . . . . . . . . . 6 6 6 6 6 
             . . . . . . . . . 6 6 7 7 7 7 8 
@@ -1249,11 +1260,36 @@ function spawnGoals () {
             . . . . . . . . c e 2 2 2 2 c . 
             . . . . . . . . . c c c c c . . 
             `, SpriteKind.Food)
-        tiles.placeOnTile(cherry, value)
-        tiles.setTileAt(value, assets.tile`transparency16`)
+        tiles.placeOnTile(cherry, value9)
+        tiles.setTileAt(value9, assets.tile`transparency16`)
+    }
+    for (let value104 of tiles.getTilesByType(assets.tile`myTile1`)) {
+        coin = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . f f f f . . . . . . 
+            . . . . f f 5 5 5 5 f f . . . . 
+            . . . . f 5 5 5 5 5 5 f . . . . 
+            . . . f 5 5 5 4 4 5 5 5 f . . . 
+            . . . f 5 5 5 4 4 5 5 5 f . . . 
+            . . . f 5 5 5 4 4 5 5 5 f . . . 
+            . . . f 5 5 5 4 4 5 5 5 f . . . 
+            . . . . f 5 5 5 5 5 5 f . . . . 
+            . . . . f f 5 5 5 5 f f . . . . 
+            . . . . . . f f f f . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Coin)
+        tiles.placeOnTile(coin, value104)
+        animation.attachAnimation(coin, coinAnimation)
+        animation.setAction(coin, ActionKind.Idle)
+        tiles.setTileAt(value104, assets.tile`myTile0`)
     }
 }
 let musicRally = 0
+let outWater = false
 let heroFacingLeft = false
 let cherry: Sprite = null
 let coin: Sprite = null
@@ -1279,11 +1315,13 @@ let flierFlying: animation.Animation = null
 let mainIdleRight: animation.Animation = null
 let mainIdleLeft: animation.Animation = null
 let doubleJumpSpeed = 0
-let canDoubleJump = false
 let bonus = 0
 let coinAnimation: animation.Animation = null
 let boss = 0
 let redFlier: Sprite = null
+let canDoubleJump = false
+let inWater = 0
+let water = 0
 let levelnumber = 0
 let world = 0
 let currentLevel = 0
@@ -1437,8 +1475,8 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 20
-currentLevel = 0
+levelCount = 21
+currentLevel = 20
 world = 1
 levelnumber = 1
 giveIntroduction()
@@ -1452,84 +1490,84 @@ game.onUpdate(function () {
 })
 // bumper movement
 game.onUpdate(function () {
-    for (let value9 of sprites.allOfKind(SpriteKind.Bumper)) {
-        if (value9.isHittingTile(CollisionDirection.Left)) {
-            value9.vx = Math.randomRange(30, 60)
-        } else if (value9.isHittingTile(CollisionDirection.Right)) {
-            value9.vx = Math.randomRange(-60, -30)
+    for (let value92 of sprites.allOfKind(SpriteKind.Bumper)) {
+        if (value92.isHittingTile(CollisionDirection.Left)) {
+            value92.vx = Math.randomRange(30, 60)
+        } else if (value92.isHittingTile(CollisionDirection.Right)) {
+            value92.vx = Math.randomRange(-60, -30)
         }
     }
 })
 game.onUpdate(function () {
-    for (let value9 of sprites.allOfKind(SpriteKind.hardHatBumper)) {
-        if (value9.isHittingTile(CollisionDirection.Left)) {
-            value9.vx = Math.randomRange(30, 60)
-        } else if (value9.isHittingTile(CollisionDirection.Right)) {
-            value9.vx = Math.randomRange(-60, -30)
+    for (let value93 of sprites.allOfKind(SpriteKind.hardHatBumper)) {
+        if (value93.isHittingTile(CollisionDirection.Left)) {
+            value93.vx = Math.randomRange(30, 60)
+        } else if (value93.isHittingTile(CollisionDirection.Right)) {
+            value93.vx = Math.randomRange(-60, -30)
         }
     }
 })
 // Flier movement
 game.onUpdate(function () {
-    for (let value8 of sprites.allOfKind(SpriteKind.Flier)) {
-        if (Math.abs(value8.x - hero.x) < 60) {
-            if (value8.x - hero.x < -5) {
-                value8.vx = 25
-            } else if (value8.x - hero.x > 5) {
-                value8.vx = -25
+    for (let value82 of sprites.allOfKind(SpriteKind.Flier)) {
+        if (Math.abs(value82.x - hero.x) < 60) {
+            if (value82.x - hero.x < -5) {
+                value82.vx = 25
+            } else if (value82.x - hero.x > 5) {
+                value82.vx = -25
             }
-            if (value8.y - hero.y < -5) {
-                value8.vy = 25
-            } else if (value8.y - hero.y > 5) {
-                value8.vy = -25
+            if (value82.y - hero.y < -5) {
+                value82.vy = 25
+            } else if (value82.y - hero.y > 5) {
+                value82.vy = -25
             }
-            animation.setAction(value8, ActionKind.Flying)
+            animation.setAction(value82, ActionKind.Flying)
         } else {
-            value8.vy = -20
-            value8.vx = 0
-            animation.setAction(value8, ActionKind.Idle)
+            value82.vy = -20
+            value82.vx = 0
+            animation.setAction(value82, ActionKind.Idle)
         }
     }
 })
 game.onUpdate(function () {
-    for (let value8 of sprites.allOfKind(SpriteKind.blueflier)) {
-        if (Math.abs(value8.x - hero.x) < 60) {
-            if (value8.x - hero.x < -5) {
-                value8.vx = 25
-            } else if (value8.x - hero.x > 5) {
-                value8.vx = -25
+    for (let value83 of sprites.allOfKind(SpriteKind.blueflier)) {
+        if (Math.abs(value83.x - hero.x) < 60) {
+            if (value83.x - hero.x < -5) {
+                value83.vx = 25
+            } else if (value83.x - hero.x > 5) {
+                value83.vx = -25
             }
-            if (value8.y - hero.y < -5) {
-                value8.vy = 25
-            } else if (value8.y - hero.y > 5) {
-                value8.vy = -25
+            if (value83.y - hero.y < -5) {
+                value83.vy = 25
+            } else if (value83.y - hero.y > 5) {
+                value83.vy = -25
             }
-            animation.setAction(value8, ActionKind.Flying)
+            animation.setAction(value83, ActionKind.Flying)
         } else {
-            value8.vy = -20
-            value8.vx = 0
-            animation.setAction(value8, ActionKind.Idle)
+            value83.vy = -20
+            value83.vx = 0
+            animation.setAction(value83, ActionKind.Idle)
         }
     }
 })
 game.onUpdate(function () {
-    for (let value8 of sprites.allOfKind(SpriteKind.flierBoss)) {
-        if (Math.abs(value8.x - hero.x) < 60) {
-            if (value8.x - hero.x < -5) {
-                value8.vx = 25
-            } else if (value8.x - hero.x > 5) {
-                value8.vx = -25
+    for (let value84 of sprites.allOfKind(SpriteKind.flierBoss)) {
+        if (Math.abs(value84.x - hero.x) < 60) {
+            if (value84.x - hero.x < -5) {
+                value84.vx = 25
+            } else if (value84.x - hero.x > 5) {
+                value84.vx = -25
             }
-            if (value8.y - hero.y < -5) {
-                value8.vy = 25
-            } else if (value8.y - hero.y > 5) {
-                value8.vy = -25
+            if (value84.y - hero.y < -5) {
+                value84.vy = 25
+            } else if (value84.y - hero.y > 5) {
+                value84.vy = -25
             }
-            animation.setAction(value8, ActionKind.Flying)
+            animation.setAction(value84, ActionKind.Flying)
         } else {
-            value8.vy = -20
-            value8.vx = 0
-            animation.setAction(value8, ActionKind.Idle)
+            value84.vy = -20
+            value84.vx = 0
+            animation.setAction(value84, ActionKind.Idle)
         }
     }
 })
@@ -1567,11 +1605,24 @@ game.onUpdate(function () {
         }
     }
 })
+game.onUpdate(function () {
+    if (inWater < game.runtime()) {
+        water = 1
+        outWater = true
+    } else {
+        if (outWater) {
+            outWater = false
+            hero.vy = hero.vy / water
+        }
+    }
+    hero.ay = gravity / water
+    controller.moveSprite(hero, 100 / water, 0)
+})
 forever(function () {
     if (boss > 0) {
         music.playMelody("F G F - A G F E ", 380)
         musicRally += 1
-        if (musicRally > 2) {
+        if (musicRally > 4) {
             musicRally = 0
             music.playMelody("F - G G F E B C5 ", 380)
         }
