@@ -21,6 +21,7 @@ namespace SpriteKind {
     export const hardHatBumper = SpriteKind.create()
     export const flierBoss = SpriteKind.create()
     export const blueflier = SpriteKind.create()
+    export const fish = SpriteKind.create()
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
     water = 2
@@ -375,9 +376,17 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level17`)
     } else if (level == 19) {
         tiles.setTilemap(tilemap`level19`)
+    } else if (level == 20) {
+        tiles.setTilemap(tilemap`level20`)
+    } else if (level == 21) {
+        tiles.setTilemap(tilemap`level46`)
+    } else if (level == 22) {
+        tiles.setTilemap(tilemap`level47`)
+    } else if (level == 23) {
+        tiles.setTilemap(tilemap`level49`)
     } else {
-        if (level == 20) {
-            tiles.setTilemap(tilemap`level20`)
+        if (level == 24) {
+            tiles.setCurrentTilemap(tilemap`level82`)
         }
     }
     clearGame()
@@ -461,6 +470,22 @@ function initializeFlierAnimations () {
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump()
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile4`, function (sprite, location) {
+    if (info.life() < 8) {
+        info.changeLifeBy(1)
+    }
+    if (bonus > 0) {
+        game.splash("Next level unlocked!")
+        if (game.ask("you got the cherry!", "go to bonus level?")) {
+            bonusLevel()
+        } else {
+            normalLevel()
+        }
+    } else {
+        normalLevel()
+    }
+    bonus = 0
 })
 function animateRun () {
     mainRunLeft = animation.createAnimation(ActionKind.RunningLeft, 100)
@@ -809,6 +834,9 @@ function clearGame () {
     for (let value6 of sprites.allOfKind(SpriteKind.blueflier)) {
         value6.destroy()
     }
+    for (let value6 of sprites.allOfKind(SpriteKind.fish)) {
+        value6.destroy()
+    }
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile26`, function (sprite, location) {
     water = 2
@@ -983,6 +1011,68 @@ function createEnemies () {
         true
         )
     }
+    for (let value103 of tiles.getTilesByType(assets.tile`myTile3`)) {
+        snapey = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . a a 1 . . . 1 a a . . . . 
+            . . . a a . . . . . a a . . . . 
+            . . . . a a 1 . 1 a a . . . . . 
+            . . . . a a . . . a a . . . . . 
+            . . . . . a a . a a . . . . . . 
+            . . . . . a a 1 a a . . . . . . 
+            . . . . . . a a a . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            . . . . 7 . . 7 . . 7 . . . . . 
+            . . . . . 7 . 7 . 7 . . . . . . 
+            . . . . . . 7 7 7 . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            `, SpriteKind.snaper)
+        tiles.placeOnTile(snapey, value103)
+        tiles.setTileAt(value103, assets.tile`myTile0`)
+        animation.runImageAnimation(
+        snapey,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . a a 1 . . . 1 a a . . . . 
+            . . . a a . . . . . a a . . . . 
+            . . . . a a 1 . 1 a a . . . . . 
+            . . . . a a . . . a a . . . . . 
+            . . . . . a a . a a . . . . . . 
+            . . . . . a a 1 a a . . . . . . 
+            . . . . . . a a a . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            . . . . 7 . . 7 . . 7 . . . . . 
+            . . . . . 7 . 7 . 7 . . . . . . 
+            . . . . . . 7 7 7 . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . a c a . . . . . . . 
+            . . . . . a a c a a . . . . . . 
+            . . . . a a a 1 a a a . . . . . 
+            . . . . a a a c a a a . . . . . 
+            . . . . a a a c a a a . . . . . 
+            . . . . . a a 1 a a . . . . . . 
+            . . . . . a a c a a . . . . . . 
+            . . . . . . a c a . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            . . . . 7 . . 7 . . 7 . . . . . 
+            . . . . . 7 . 7 . 7 . . . . . . 
+            . . . . . . 7 7 7 . . . . . . . 
+            . . . . . . . 7 . . . . . . . . 
+            `],
+        200,
+        true
+        )
+    }
     for (let value7 of tiles.getTilesByType(assets.tile`tile18`)) {
         hatBumper = sprites.create(img`
             . . . . . . . . . . . . . . . . 
@@ -1018,6 +1108,12 @@ function createEnemies () {
         animation.attachAnimation(mySprite, blueFlierFlying)
         animation.attachAnimation(mySprite, blueFlierIdle)
     }
+    for (let value7 of tiles.getTilesByType(assets.tile`myTile2`)) {
+        hatBumper = sprites.create(assets.image`myImage0`, SpriteKind.fish)
+        tiles.placeOnTile(hatBumper, value7)
+        tiles.setTileAt(value7, assets.tile`myTile0`)
+        hatBumper.vx = -45
+    }
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`tile17`, function (sprite, location) {
     info.changeScoreBy(20)
@@ -1043,6 +1139,12 @@ function normalLevel () {
     bonusPick = 0
     hero.say("" + world + "-" + levelnumber, 1000)
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.fish, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    sprite.say("Ow!", invincibilityPeriod)
+    music.powerDown.play()
+    pause(invincibilityPeriod)
+})
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
         hero.vy += 80
@@ -1050,6 +1152,12 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 scene.onOverlapTile(SpriteKind.Flier, assets.tile`myTile`, function (sprite, location) {
     sprite.destroy(effects.rings, 500)
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile5`, function (sprite, location) {
+    info.changeScoreBy(20)
+    info.setLife(bonusLife)
+    info.changeLifeBy(1)
+    normalLevel()
 })
 info.onLifeZero(function () {
     if (bonusPick > 0) {
@@ -1207,9 +1315,11 @@ function bonusLevel () {
         tiles.setTilemap(tilemap`level7`)
     } else if (world == 4) {
         tiles.setTilemap(tilemap`level11`)
+    } else if (world == 5) {
+        tiles.setTilemap(tilemap`level18`)
     } else {
-        if (world == 5) {
-            tiles.setTilemap(tilemap`level18`)
+        if (world == 6) {
+            tiles.setCurrentTilemap(tilemap`level48`)
         }
     }
     hero.say("" + world + "-" + "bonus", 1000)
@@ -1475,8 +1585,8 @@ scene.setBackgroundImage(img`
     `)
 initializeAnimations()
 createPlayer(hero)
-levelCount = 21
-currentLevel = 20
+levelCount = 25
+currentLevel = 24
 world = 1
 levelnumber = 1
 giveIntroduction()
@@ -1602,6 +1712,17 @@ game.onUpdate(function () {
             animation.setAction(hero, ActionKind.IdleLeft)
         } else {
             animation.setAction(hero, ActionKind.IdleRight)
+        }
+    }
+})
+game.onUpdate(function () {
+    for (let value93 of sprites.allOfKind(SpriteKind.fish)) {
+        if (value93.isHittingTile(CollisionDirection.Left)) {
+            value93.vx = 45
+            value93.setImage(assets.image`myImage`)
+        } else if (value93.isHittingTile(CollisionDirection.Right)) {
+            value93.vx = -45
+            value93.setImage(assets.image`myImage0`)
         }
     }
 })

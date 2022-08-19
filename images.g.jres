@@ -1,4 +1,14 @@
 {
+    "image2": {
+        "data": "hwQQABAAAAAAAAAAAwAAAAAAADcyBwAAAABwNzF3AAAAAHc3MncHAABw9zcxd3cAAHB3NzJ3dwAAcHc3MXd3AABwdzcyd3cAAHB3NzF3dwAAcHc3Mnd3AABwd3d3d3cAAHB3d3d3dwAAAHd3d3cHAAAAcHd3dwAAAAAAcHcAAAAAAHB3d3cAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "myImage0"
+    },
+    "image1": {
+        "data": "hwQQABAAAAAAAHB3d3cAAAAAAHB3AAAAAABwd3d3AAAAAHd3d3cHAABwd3d3d3cAAHB3d3d3dwAAcHc3Mnd3AABwdzcxd3cAAHB3NzJ3dwAAcHc3MXd3AABwdzcyd3cAAHD3NzF3dwAAAHc3MncHAAAAcDcxdwAAAAAANzIHAAAAAAAAAwAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "myImage"
+    },
     "anim3": {
         "namespace": "myAnimations",
         "id": "anim3",
