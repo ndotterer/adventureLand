@@ -384,9 +384,15 @@ function setLevelTileMap (level: number) {
         tiles.setTilemap(tilemap`level47`)
     } else if (level == 23) {
         tiles.setTilemap(tilemap`level49`)
+    } else if (level == 24) {
+        tiles.setCurrentTilemap(tilemap`level82`)
+    } else if (level == 25) {
+        tiles.setCurrentTilemap(tilemap`level83`)
+    } else if (level == 26) {
+        tiles.setCurrentTilemap(tilemap`level86`)
     } else {
-        if (level == 24) {
-            tiles.setCurrentTilemap(tilemap`level82`)
+        if (level == 27) {
+            tiles.setCurrentTilemap(tilemap`level88`)
         }
     }
     clearGame()
@@ -1317,9 +1323,11 @@ function bonusLevel () {
         tiles.setTilemap(tilemap`level11`)
     } else if (world == 5) {
         tiles.setTilemap(tilemap`level18`)
+    } else if (world == 6) {
+        tiles.setCurrentTilemap(tilemap`level48`)
     } else {
-        if (world == 6) {
-            tiles.setCurrentTilemap(tilemap`level48`)
+        if (world == 7) {
+            tiles.setCurrentTilemap(tilemap`level85`)
         }
     }
     hero.say("" + world + "-" + "bonus", 1000)
